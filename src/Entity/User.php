@@ -2,45 +2,105 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\Post;
 use App\Repository\UserRepository;
+use App\Validator\ValidateRole;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
+#[UniqueEntity("email", message: "Un utilisateur existe déjà avec cette adresse mail.")]
+#[ApiResource(
+    operations: [
+        new Get(
+            uriTemplate: '/{id}',
+            requirements: ['id' => '\d+'],
+            security: 'is_granted("ROLE_USER") === true'
+        ),
+        new Post(
+            uriTemplate: '',
+        )
+    ],
+    routePrefix: '/users',
+    normalizationContext: ["groups" => ["users_read"]],
+    denormalizationContext: ["groups" => ["users_write"]]
+)]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(["users_read"])]
     private ?int $id = null;
 
     #[ORM\Column(length: 180, unique: true)]
+    #[Assert\NotBlank(message: "Le champ 'email' est obligatoire.")]
+    #[Assert\Email(
+        message: "L'adresse email '{{ value }}' n'est pas valide."
+    )]
+    #[Groups(["users_read", "users_write"])]
     private ?string $email = null;
 
     #[ORM\Column]
+    #[ValidateRole]
+    #[Groups(["users_read", "users_write"])]
     private array $roles = [];
 
     #[ORM\Column]
+    #[Assert\NotBlank(message: "Le mot de passe est obligatoire.")]
+    #[Assert\Length(
+        min: 8,
+        max: 200,
+        minMessage: "Le mot de passe doit comporter au moins 8 caractères.",
+        maxMessage: "Le mot de passe ne peut excéder 200 caractères."
+    )]
+    #[Groups(["users_write"])]
     private ?string $password = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Assert\Length(
+        min: 2,
+        max: 50,
+        minMessage: "Le prénom doit comporter au moins 2 caractères.",
+        maxMessage: "Le prénom ne doit pas comporter plus de 50 caractères."
+    )]
+    #[Assert\Regex("/^[A-Za-zÀ-úœ'\-\s]+$/", message: "Le champ 'lastName' contient des caractères invalides.")]
+    #[Groups(["users_read", "users_write"])]
     private ?string $firstName = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Assert\Length(
+        min: 2,
+        max: 50,
+        minMessage: "Le nom doit comporter au moins 2 caractères.",
+        maxMessage: "Le nom ne doit pas comporter plus de 50 caractères."
+    )]
+    #[Assert\Regex("/^[A-Za-zÀ-úœ'\-\s]+$/", message: "Le champ 'lastName' contient des caractères invalides.")]
+    #[Groups(["users_read", "users_write"])]
     private ?string $lastName = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(["users_read", "users_write"])]
     private ?string $avatar = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(["users_read", "users_write"])]
     private ?string $licenceNumber = null;
 
     #[ORM\Column(nullable: true)]
+    #[Assert\GreaterThanOrEqual(500)]
+    #[Groups(["users_read", "users_write"])]
     private ?int $officialPoints = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
+    #[Groups(["users_read", "users_write"])]
     private ?\DateTimeInterface $birthdate = null;
 
     public function getId(): ?int
