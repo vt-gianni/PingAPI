@@ -21,28 +21,37 @@ class TournamentRepository extends ServiceEntityRepository
         parent::__construct($registry, Tournament::class);
     }
 
-//    /**
-//     * @return Tournament[] Returns an array of Tournament objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('t')
-//            ->andWhere('t.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('t.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
+    /**
+     * Récupère les tournois à venir.
+     *
+     * @return Tournament[]
+     */
+    public function findUpcomingTournaments(): array
+    {
+        $currentDate = new \DateTime();
 
-//    public function findOneBySomeField($value): ?Tournament
-//    {
-//        return $this->createQueryBuilder('t')
-//            ->andWhere('t.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
+        return $this->createQueryBuilder('t')
+            ->where('t.beginDate >= :currentDate')
+            ->setParameter('currentDate', $currentDate->setTime(0, 0, 0))
+            ->orderBy('t.beginDate', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
+     * Récupère les tournois déjà passés.
+     *
+     * @return Tournament[]
+     */
+    public function findPastTournaments(): array
+    {
+        $currentDate = new \DateTime();
+
+        return $this->createQueryBuilder('t')
+            ->where('t.endDate < :currentDate')
+            ->setParameter('currentDate', $currentDate->setTime(0, 0, 0)) // Set the time to 00:00:00
+            ->orderBy('t.endDate', 'DESC')
+            ->getQuery()
+            ->getResult();
+    }
 }

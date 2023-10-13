@@ -2,33 +2,54 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\GetCollection;
 use App\Repository\TournamentRepository;
+use App\State\TournamentProvider;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: TournamentRepository::class)]
+#[ApiResource(
+    operations: [
+        new GetCollection(
+            uriTemplate: '/',
+            security: 'is_granted("ROLE_USER") === true',
+            provider: TournamentProvider::class
+        )
+    ],
+    routePrefix: '/tournaments',
+    normalizationContext: ["groups" => ["tournaments_read"]]
+)]
 class Tournament
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(["tournaments_read"])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(["tournaments_read"])]
     private ?string $city = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(["tournaments_read"])]
     private ?string $zipCode = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE)]
+    #[Groups(["tournaments_read"])]
     private ?\DateTimeInterface $beginDate = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE)]
+    #[Groups(["tournaments_read"])]
     private ?\DateTimeInterface $endDate = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(["tournaments_read"])]
     private ?string $gym = null;
 
     #[ORM\OneToMany(mappedBy: 'tournament', targetEntity: Serie::class, orphanRemoval: true)]

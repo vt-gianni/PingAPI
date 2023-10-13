@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use App\Repository\UserRepository;
 use App\Validator\ValidateRole;
@@ -22,6 +23,10 @@ use Symfony\Component\Validator\Constraints as Assert;
         new Get(
             uriTemplate: '/{id}',
             requirements: ['id' => '\d+'],
+            security: 'is_granted("ROLE_USER") === true'
+        ),
+        new GetCollection(
+            uriTemplate: '/',
             security: 'is_granted("ROLE_USER") === true'
         ),
         new Post(
