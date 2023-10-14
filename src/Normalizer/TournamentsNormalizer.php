@@ -15,10 +15,10 @@ class TournamentsNormalizer implements NormalizerInterface
 
     private function normalizeOperations(array $operations, array $context): array
     {
-        $normalizedOperations = ['hydra:totalItems' => count($operations)];
+        $normalizedOperations = ['hydra:totalItems' => count($operations), 'hydra:member' => []];
 
         foreach ($operations as $operation) {
-            $normalizedOperations[] = $this->normalizer->normalize($operation, null, $context);
+            $normalizedOperations['hydra:member'][] = $this->normalizer->normalize($operation, null, $context);
         }
 
         return $normalizedOperations;
@@ -30,10 +30,8 @@ class TournamentsNormalizer implements NormalizerInterface
             '@context' => '/api/contexts/Tournament',
             '@id' => '/api/tournaments/',
             '@type' => 'hydra:Collection',
-            'hydra:member' => [
-              'upcoming' => $this->normalizeOperations($object['upcoming'], $context),
-              'past' => $this->normalizeOperations($object['past'], $context)
-            ]
+            'upcoming' => $this->normalizeOperations($object['upcoming'], $context),
+            'past' => $this->normalizeOperations($object['past'], $context)
         ];
     }
 
