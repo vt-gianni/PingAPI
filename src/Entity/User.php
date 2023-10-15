@@ -55,8 +55,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column]
     #[ValidateRole]
-    #[Groups(["users_read", "users_write"])]
-    private array $roles = [];
+    #[Groups(["users_read"])]
+    private array $roles = ["ROLE_USER"];
 
     #[ORM\Column]
     #[Assert\NotBlank(message: "Le mot de passe est obligatoire.")]
@@ -107,6 +107,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
     #[Groups(["users_read", "users_write"])]
     private ?\DateTimeInterface $birthdate = null;
+
+    #[ORM\ManyToOne(inversedBy: 'users')]
+    #[Groups(["users_read", "users_write"])]
+    private ?Club $club = null;
 
     public function getId(): ?int
     {
@@ -246,6 +250,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setBirthdate(?\DateTimeInterface $birthdate): static
     {
         $this->birthdate = $birthdate;
+
+        return $this;
+    }
+
+    public function getClub(): ?Club
+    {
+        return $this->club;
+    }
+
+    public function setClub(?Club $club): static
+    {
+        $this->club = $club;
 
         return $this;
     }
