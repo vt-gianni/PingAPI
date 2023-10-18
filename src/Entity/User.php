@@ -6,8 +6,10 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
 use App\Repository\UserRepository;
 use App\Validator\ValidateRole;
+use App\Validator\ValidateSexe;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
@@ -31,6 +33,12 @@ use Symfony\Component\Validator\Constraints as Assert;
         ),
         new Post(
             uriTemplate: '',
+        ),
+        new Put(
+            uriTemplate: '/{id}',
+            requirements: ['id' => '\d+'],
+            denormalizationContext: ['groups' => ['users_put']],
+            security: 'is_granted("ROLE_USER") === true'
         )
     ],
     routePrefix: '/users',
@@ -111,6 +119,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\ManyToOne(inversedBy: 'users')]
     #[Groups(["users_read", "users_write"])]
     private ?Club $club = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(["users_read", "users_write"])]
+    #[ValidateSexe]
+    private ?string $sexe = null;
 
     public function getId(): ?int
     {
@@ -262,6 +275,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setClub(?Club $club): static
     {
         $this->club = $club;
+
+        return $this;
+    }
+
+    public function getSexe(): ?string
+    {
+        return $this->sexe;
+    }
+
+    public function setSexe(?string $sexe): static
+    {
+        $this->sexe = $sexe;
 
         return $this;
     }
