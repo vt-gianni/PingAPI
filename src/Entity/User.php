@@ -8,6 +8,7 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use App\Repository\UserRepository;
+use App\State\UserProcessor;
 use App\Validator\ValidateRole;
 use App\Validator\ValidateSexe;
 use Doctrine\DBAL\Types\Types;
@@ -33,6 +34,7 @@ use Symfony\Component\Validator\Constraints as Assert;
         ),
         new Post(
             uriTemplate: '',
+            processor: UserProcessor::class
         ),
         new Put(
             uriTemplate: '/{id}',
