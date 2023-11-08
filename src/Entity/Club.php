@@ -32,39 +32,39 @@ class Club
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(["clubs_read", "users_read"])]
+    #[Groups(["clubs_read", "users_read", "users_write"])]
     private ?string $name = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(["clubs_read", "users_read"])]
+    #[Groups(["clubs_read", "users_read", "users_write"])]
     private ?string $city = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(["clubs_read", "users_read"])]
+    #[Groups(["clubs_read", "users_read", "users_write"])]
     private ?string $zipCode = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(["clubs_read", "users_read"])]
+    #[Groups(["clubs_read", "users_read", "users_write"])]
     private ?string $address = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(["clubs_read", "users_read"])]
+    #[Groups(["clubs_read", "users_read", "users_write"])]
     private ?string $addressMore = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(["clubs_read", "users_read"])]
+    #[Groups(["clubs_read", "users_read", "users_write"])]
     private ?string $number = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(["clubs_read", "users_read"])]
+    #[Groups(["clubs_read", "users_read", "users_write"])]
     private ?string $gym = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(["clubs_read", "users_read"])]
+    #[Groups(["clubs_read", "users_read", "users_write"])]
     private ?string $mailAddress = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(["clubs_read", "users_read"])]
+    #[Groups(["clubs_read", "users_read", "users_write"])]
     private ?string $phone = null;
 
     #[ORM\OneToMany(mappedBy: 'club', targetEntity: User::class)]

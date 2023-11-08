@@ -118,7 +118,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Groups(["users_read", "users_write"])]
     private ?\DateTimeInterface $birthdate = null;
 
-    #[ORM\ManyToOne(inversedBy: 'users')]
+    #[ORM\ManyToOne(cascade: ['persist'], inversedBy: 'users')]
     #[Groups(["users_read", "users_write"])]
     private ?Club $club = null;
 

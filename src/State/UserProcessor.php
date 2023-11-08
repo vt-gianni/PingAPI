@@ -4,8 +4,10 @@ namespace App\State;
 
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
+use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use JetBrains\PhpStorm\NoReturn;
+use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
@@ -16,6 +18,15 @@ class UserProcessor implements ProcessorInterface
                                 private readonly UserPasswordHasherInterface $hasher
     ) {}
 
+    private function manageClubRegistration($request, User $user)
+    {
+        $user->setRoles(['ROLE_LEADER']);
+
+        if (!array_key_exists('accountHolder', $request) || !array_key_exists('iban', $request) || !array_key_exists('bic', $request)) {
+            throw new BadRequestException('Les informations relatives au compte à créditer sont nécessaires.', 400);
+        }
+    }
+
     #[NoReturn] public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = [])
     {
         $request = json_decode($this->requestStack->getCurrentRequest()->getContent(), true);
@@ -24,6 +35,11 @@ class UserProcessor implements ProcessorInterface
             $hash = $this->hasher->hashPassword($data, $data->getPassword());
             $data->setPassword($hash);
         }
+
+        if (array_key_exists('club', $request)) {
+            $this->manageClubRegistration($request, $data);
+        }
+
         $this->entityManager->persist($data);
         $this->entityManager->flush();
     }
