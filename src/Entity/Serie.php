@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Repository\SerieRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: SerieRepository::class)]
 class Serie
@@ -12,6 +13,7 @@ class Serie
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(["tournaments_read"])]
     private ?int $id = null;
 
     #[ORM\ManyToOne(inversedBy: 'series')]
@@ -19,39 +21,51 @@ class Serie
     private ?Tournament $tournament = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[Groups(["tournaments_read"])]
     private ?\DateTimeInterface $beginDateTime = null;
 
     #[ORM\Column]
+    #[Groups(["tournaments_read"])]
     private ?bool $isHandicap = null;
 
     #[ORM\Column]
+    #[Groups(["tournaments_read"])]
     private ?bool $isOpen = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(["tournaments_read"])]
     private ?int $minAge = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(["tournaments_read"])]
     private ?int $maxAge = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(["tournaments_read"])]
     private ?int $minPoints = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(["tournaments_read"])]
     private ?int $maxPoints = null;
 
     #[ORM\Column]
+    #[Groups(["tournaments_read"])]
     private ?bool $onlyMen = null;
 
     #[ORM\Column]
+    #[Groups(["tournaments_read"])]
     private ?bool $onlyWomen = null;
 
     #[ORM\Column]
+    #[Groups(["tournaments_read"])]
     private ?int $minPlaces = null;
 
     #[ORM\Column]
+    #[Groups(["tournaments_read"])]
     private ?int $maxPlaces = null;
 
     #[ORM\Column]
+    #[Groups(["tournaments_read"])]
     private ?int $price = null;
 
     public function getId(): ?int
