@@ -59,6 +59,7 @@ class Tournament
     private ?string $gym = null;
 
     #[ORM\OneToMany(mappedBy: 'tournament', targetEntity: Serie::class, orphanRemoval: true)]
+    #[Groups(["tournaments_read"])]
     private Collection $series;
 
     #[ORM\Column(length: 255, nullable: true)]
