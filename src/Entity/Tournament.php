@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use App\Repository\TournamentRepository;
 use App\State\TournamentProvider;
@@ -15,6 +16,11 @@ use Symfony\Component\Serializer\Annotation\Groups;
 #[ORM\Entity(repositoryClass: TournamentRepository::class)]
 #[ApiResource(
     operations: [
+        new Get(
+            uriTemplate: '/{id}',
+            requirements: ['id' => '\d+'],
+            security: 'is_granted("ROLE_USER") === true'
+        ),
         new GetCollection(
             uriTemplate: '/',
             security: 'is_granted("ROLE_USER") === true',
