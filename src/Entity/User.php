@@ -5,9 +5,11 @@ namespace App\Entity;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use App\Repository\UserRepository;
+use App\State\EditUserProcessor;
 use App\State\UserProcessor;
 use App\Validator\ValidateRole;
 use App\Validator\ValidateSexe;
@@ -36,11 +38,13 @@ use Symfony\Component\Validator\Constraints as Assert;
             uriTemplate: '',
             processor: UserProcessor::class
         ),
-        new Put(
+        new Patch(
             uriTemplate: '/{id}',
             requirements: ['id' => '\d+'],
             denormalizationContext: ['groups' => ['users_put']],
-            security: 'is_granted("ROLE_USER") === true'
+            security: "is_granted('ROLE_ADMIN') === true or (user === object)",
+            processor: EditUserProcessor::class
+
         )
     ],
     routePrefix: '/users',
@@ -56,11 +60,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?int $id = null;
 
     #[ORM\Column(length: 180, unique: true)]
-    #[Assert\NotBlank(message: "Le champ 'email' est obligatoire.")]
+    #[Assert\NotBlank(message: "Le champ 'email' est obligatoire.", groups: ["users_write"])]
     #[Assert\Email(
         message: "L'adresse email '{{ value }}' n'est pas valide."
     )]
-    #[Groups(["users_read", "users_write"])]
+    #[Groups(["users_read", "users_write", "users_put"])]
     private ?string $email = null;
 
     #[ORM\Column]
@@ -69,14 +73,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private array $roles = ["ROLE_USER"];
 
     #[ORM\Column]
-    #[Assert\NotBlank(message: "Le mot de passe est obligatoire.")]
+    #[Assert\NotBlank(message: "Le mot de passe est obligatoire.", groups: ["users_write"])]
     #[Assert\Length(
         min: 8,
         max: 200,
         minMessage: "Le mot de passe doit comporter au moins 8 caractères.",
         maxMessage: "Le mot de passe ne peut excéder 200 caractères."
     )]
-    #[Groups(["users_write"])]
+    #[Groups(["users_write", "users_put"])]
     private ?string $password = null;
 
     #[ORM\Column(length: 255, nullable: true)]
@@ -87,7 +91,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         maxMessage: "Le prénom ne doit pas comporter plus de 50 caractères."
     )]
     #[Assert\Regex("/^[A-Za-zÀ-úœ'\-\s]+$/", message: "Le champ 'lastName' contient des caractères invalides.")]
-    #[Groups(["users_read", "users_write"])]
+    #[Groups(["users_read", "users_write", "users_put"])]
     private ?string $firstName = null;
 
     #[ORM\Column(length: 255, nullable: true)]
@@ -98,32 +102,32 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         maxMessage: "Le nom ne doit pas comporter plus de 50 caractères."
     )]
     #[Assert\Regex("/^[A-Za-zÀ-úœ'\-\s]+$/", message: "Le champ 'lastName' contient des caractères invalides.")]
-    #[Groups(["users_read", "users_write"])]
+    #[Groups(["users_read", "users_write", "users_put"])]
     private ?string $lastName = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(["users_read", "users_write"])]
+    #[Groups(["users_read", "users_write", "users_put"])]
     private ?string $avatar = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(["users_read", "users_write"])]
+    #[Groups(["users_read", "users_write", "users_put"])]
     private ?string $licenceNumber = null;
 
     #[ORM\Column(nullable: true)]
     #[Assert\GreaterThanOrEqual(500)]
-    #[Groups(["users_read", "users_write"])]
+    #[Groups(["users_read", "users_write", "users_put"])]
     private ?int $officialPoints = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
-    #[Groups(["users_read", "users_write"])]
+    #[Groups(["users_read", "users_write", "users_put"])]
     private ?\DateTimeInterface $birthdate = null;
 
     #[ORM\ManyToOne(cascade: ['persist'], inversedBy: 'users')]
-    #[Groups(["users_read", "users_write"])]
+    #[Groups(["users_read", "users_write", "users_put"])]
     private ?Club $club = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(["users_read", "users_write"])]
+    #[Groups(["users_read", "users_write", "users_put"])]
     #[ValidateSexe]
     private ?string $sexe = null;
 
