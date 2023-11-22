@@ -55,6 +55,10 @@ class Tournament
     #[ORM\OneToMany(mappedBy: 'tournament', targetEntity: Serie::class, orphanRemoval: true)]
     private Collection $series;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(["tournaments_read"])]
+    private ?string $address = null;
+
     public function __construct()
     {
         $this->series = new ArrayCollection();
@@ -151,6 +155,18 @@ class Tournament
                 $series->setTournament(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getAddress(): ?string
+    {
+        return $this->address;
+    }
+
+    public function setAddress(?string $address): static
+    {
+        $this->address = $address;
 
         return $this;
     }
