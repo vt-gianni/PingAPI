@@ -13,6 +13,8 @@ use App\State\EditUserProcessor;
 use App\State\UserProcessor;
 use App\Validator\ValidateRole;
 use App\Validator\ValidateSexe;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
@@ -56,7 +58,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(["users_read"])]
+    #[Groups(["users_read", "series_read", "tournaments_read"])]
     private ?int $id = null;
 
     #[ORM\Column(length: 180, unique: true)]
@@ -130,6 +132,15 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Groups(["users_read", "users_write", "users_put"])]
     #[ValidateSexe]
     private ?string $sexe = null;
+
+    #[ORM\ManyToMany(targetEntity: Serie::class, mappedBy: 'usersRegistered')]
+    #[Groups(["users_read", "users_write", "users_put"])]
+    private Collection $series;
+
+    public function __construct()
+    {
+        $this->series = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -293,6 +304,33 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setSexe(?string $sexe): static
     {
         $this->sexe = $sexe;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Serie>
+     */
+    public function getSeries(): Collection
+    {
+        return $this->series;
+    }
+
+    public function addSeries(Serie $series): static
+    {
+        if (!$this->series->contains($series)) {
+            $this->series->add($series);
+            $series->addUsersRegistered($this);
+        }
+
+        return $this;
+    }
+
+    public function removeSeries(Serie $series): static
+    {
+        if ($this->series->removeElement($series)) {
+            $series->removeUsersRegistered($this);
+        }
 
         return $this;
     }

@@ -2,18 +2,41 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Get;
 use App\Repository\SerieRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: SerieRepository::class)]
+#[ApiResource(
+    operations: [
+        new Get(
+            uriTemplate: '/{id}',
+            requirements: ['id' => '\d+'],
+            security: 'is_granted("ROLE_USER") === true'
+        ),
+        new Post(
+            uriTemplate: '/{id}/register/{userId}',
+            requirements: ['id' => '\d+', 'userId' => '\d+'],
+            security: 'is_granted("ROLE_USER") === true',
+            controller: 'App\Controller\RegisterUserToSerie'
+        )
+    ],
+    routePrefix: '/series',
+    normalizationContext: ["groups" => ["series_read"]],
+    denormalizationContext: ["groups" => ["series_write"]]
+)]
 class Serie
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(["tournaments_read"])]
+    #[Groups(["tournaments_read", "users_read", "series_read"])]
     private ?int $id = null;
 
     #[ORM\ManyToOne(inversedBy: 'series')]
@@ -21,52 +44,61 @@ class Serie
     private ?Tournament $tournament = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    #[Groups(["tournaments_read"])]
+    #[Groups(["tournaments_read", "users_read", "series_read"])]
     private ?\DateTimeInterface $beginDateTime = null;
 
     #[ORM\Column]
-    #[Groups(["tournaments_read"])]
+    #[Groups(["tournaments_read", "users_read", "series_read"])]
     private ?bool $isHandicap = null;
 
     #[ORM\Column]
-    #[Groups(["tournaments_read"])]
+    #[Groups(["tournaments_read", "users_read", "series_read"])]
     private ?bool $isOpen = null;
 
     #[ORM\Column(nullable: true)]
-    #[Groups(["tournaments_read"])]
+    #[Groups(["tournaments_read", "users_read", "series_read"])]
     private ?int $minAge = null;
 
     #[ORM\Column(nullable: true)]
-    #[Groups(["tournaments_read"])]
+    #[Groups(["tournaments_read", "users_read", "series_read"])]
     private ?int $maxAge = null;
 
     #[ORM\Column(nullable: true)]
-    #[Groups(["tournaments_read"])]
+    #[Groups(["tournaments_read", "users_read", "series_read"])]
     private ?int $minPoints = null;
 
     #[ORM\Column(nullable: true)]
-    #[Groups(["tournaments_read"])]
+    #[Groups(["tournaments_read", "users_read", "series_read"])]
     private ?int $maxPoints = null;
 
     #[ORM\Column]
-    #[Groups(["tournaments_read"])]
+    #[Groups(["tournaments_read", "users_read", "series_read"])]
     private ?bool $onlyMen = null;
 
     #[ORM\Column]
-    #[Groups(["tournaments_read"])]
+    #[Groups(["tournaments_read", "users_read", "series_read"])]
     private ?bool $onlyWomen = null;
 
     #[ORM\Column]
-    #[Groups(["tournaments_read"])]
+    #[Groups(["tournaments_read", "users_read", "series_read"])]
     private ?int $minPlaces = null;
 
     #[ORM\Column]
-    #[Groups(["tournaments_read"])]
+    #[Groups(["tournaments_read", "users_read", "series_read"])]
     private ?int $maxPlaces = null;
 
     #[ORM\Column]
-    #[Groups(["tournaments_read"])]
+    #[Groups(["tournaments_read", "users_read", "series_read"])]
     private ?int $price = null;
+
+    #[ORM\ManyToMany(targetEntity: User::class, inversedBy: 'series')]
+    #[Groups(["series_read", "tournaments_read"])]
+    private Collection $usersRegistered;
+
+    public function __construct()
+    {
+        $this->usersRegistered = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -225,6 +257,30 @@ class Serie
     public function setPrice(int $price): static
     {
         $this->price = $price;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, User>
+     */
+    public function getUsersRegistered(): Collection
+    {
+        return $this->usersRegistered;
+    }
+
+    public function addUsersRegistered(User $usersRegistered): static
+    {
+        if (!$this->usersRegistered->contains($usersRegistered)) {
+            $this->usersRegistered->add($usersRegistered);
+        }
+
+        return $this;
+    }
+
+    public function removeUsersRegistered(User $usersRegistered): static
+    {
+        $this->usersRegistered->removeElement($usersRegistered);
 
         return $this;
     }
