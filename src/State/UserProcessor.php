@@ -21,10 +21,6 @@ class UserProcessor implements ProcessorInterface
     private function manageClubRegistration($request, User $user)
     {
         $user->setRoles(['ROLE_LEADER']);
-
-        if (!array_key_exists('accountHolder', $request) || !array_key_exists('iban', $request) || !array_key_exists('bic', $request)) {
-            throw new BadRequestException('Les informations relatives au compte à créditer sont nécessaires.', 400);
-        }
     }
 
     #[NoReturn] public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = [])
