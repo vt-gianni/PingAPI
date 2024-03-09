@@ -96,6 +96,10 @@ class Serie
     #[Groups(["series_read", "tournaments_read"])]
     private Collection $usersRegistered;
 
+    #[ORM\Column]
+    #[Groups(["tournaments_read", "users_read", "series_read"])]
+    private ?bool $canRegister = null;
+
     public function __construct()
     {
         $this->usersRegistered = new ArrayCollection();
@@ -282,6 +286,18 @@ class Serie
     public function removeUsersRegistered(User $usersRegistered): static
     {
         $this->usersRegistered->removeElement($usersRegistered);
+
+        return $this;
+    }
+
+    public function isCanRegister(): ?bool
+    {
+        return $this->canRegister;
+    }
+
+    public function setCanRegister(bool $canRegister): static
+    {
+        $this->canRegister = $canRegister;
 
         return $this;
     }
