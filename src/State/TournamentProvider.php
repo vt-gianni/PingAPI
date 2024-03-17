@@ -15,17 +15,25 @@ class TournamentProvider implements ProviderInterface
 
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): array
     {
-        $mine = false;
         if (array_key_exists('filters', $context) && array_key_exists('mine', $context['filters'])) {
-            $mine = boolval($context['filters']);
+            $mine = boolval($context['filters']['mine']);
+        }
+        if (array_key_exists('filters', $context) && array_key_exists('search', $context['filters'])) {
+            $search = $context['filters']['search'];
         }
         /** @var User $user */
         $user = $this->security->getUser();
 
         return [
-            'upcoming' => $this->repository->findUpcomingTournaments($user, $mine),
-            'inprogress' => $this->repository->findInProgressTournaments($user, $mine),
-            'past' => $this->repository->findPastTournaments($user, $mine),
+            'upcoming' => $this->repository->findUpcomingTournaments(
+                $user, $mine ?? false, $search ?? null
+            ),
+            'inprogress' => $this->repository->findInProgressTournaments(
+                $user, $mine ?? false, $search ?? null
+            ),
+            'past' => $this->repository->findPastTournaments(
+                $user, $mine ?? false, $search ?? null
+            )
         ];
     }
 

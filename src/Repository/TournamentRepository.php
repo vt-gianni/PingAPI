@@ -39,11 +39,24 @@ class TournamentRepository extends ServiceEntityRepository
     }
 
     /**
+     * @param QueryBuilder $qb
+     * @param string|null $search
+     * @return QueryBuilder
+     */
+    private function search(QueryBuilder $qb, ?string $search): QueryBuilder
+    {
+        if ($search) {
+            $qb->andWhere('LOWER(t.city) LIKE :city')->setParameter('city',  strtolower($search) . '%');
+        }
+        return $qb;
+    }
+
+    /**
      * Récupère les tournois à venir.
      *
      * @return Tournament[]
      */
-    public function findUpcomingTournaments(User $user, bool $mine = false): array
+    public function findUpcomingTournaments(User $user, bool $mine = false, ?string $search = null): array
     {
         $currentDate = new \DateTime();
 
@@ -52,6 +65,7 @@ class TournamentRepository extends ServiceEntityRepository
             ->setParameter('currentDate', $currentDate->setTime(0, 0, 0));
 
         $qb = $this->getMine($qb, $user, $mine);
+        $qb = $this->search($qb, $search);
 
         return $qb
             ->orderBy('t.beginDate', 'ASC')
@@ -65,7 +79,7 @@ class TournamentRepository extends ServiceEntityRepository
      *
      * @return Tournament[]
      */
-    public function findPastTournaments(User $user, bool $mine = false): array
+    public function findPastTournaments(User $user, bool $mine = false, ?string $search = null): array
     {
         $currentDate = new \DateTime();
 
@@ -74,6 +88,7 @@ class TournamentRepository extends ServiceEntityRepository
             ->setParameter('currentDate', $currentDate->setTime(0, 0, 0));
 
         $qb = $this->getMine($qb, $user, $mine);
+        $qb = $this->search($qb, $search);
 
         return $qb
             ->orderBy('t.endDate', 'DESC')
@@ -87,7 +102,7 @@ class TournamentRepository extends ServiceEntityRepository
      *
      * @return Tournament[]
      */
-    public function findInProgressTournaments(User $user, bool $mine = false): array
+    public function findInProgressTournaments(User $user, bool $mine = false, ?string $search = null): array
     {
         $currentDate = new \DateTime();
 
@@ -98,6 +113,7 @@ class TournamentRepository extends ServiceEntityRepository
             ->setParameter('endDate', $currentDate->setTime(23, 59, 59));
 
         $qb = $this->getMine($qb, $user, $mine);
+        $qb = $this->search($qb, $search);
 
         return $qb
             ->orderBy('t.endDate', 'DESC')
