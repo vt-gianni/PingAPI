@@ -3,7 +3,9 @@
 namespace App\Repository;
 
 use App\Entity\Tournament;
+use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -22,20 +24,40 @@ class TournamentRepository extends ServiceEntityRepository
     }
 
     /**
+     * @param QueryBuilder $qb
+     * @param User $user
+     * @param bool $mine
+     * @return QueryBuilder
+     */
+    private function getMine(QueryBuilder $qb, User $user, bool $mine): QueryBuilder
+    {
+        if ($mine) {
+            $qb->join('t.series', 's')->join('s.usersRegistered', 'u');
+            $qb->andWhere('u.id = :userId')->setParameter('userId', $user->getId());
+        }
+        return $qb;
+    }
+
+    /**
      * Récupère les tournois à venir.
      *
      * @return Tournament[]
      */
-    public function findUpcomingTournaments(): array
+    public function findUpcomingTournaments(User $user, bool $mine = false): array
     {
         $currentDate = new \DateTime();
 
-        return $this->createQueryBuilder('t')
+        $qb = $this->createQueryBuilder('t')
             ->where('t.beginDate >= :currentDate')
-            ->setParameter('currentDate', $currentDate->setTime(0, 0, 0))
+            ->setParameter('currentDate', $currentDate->setTime(0, 0, 0));
+
+        $qb = $this->getMine($qb, $user, $mine);
+
+        return $qb
             ->orderBy('t.beginDate', 'ASC')
             ->getQuery()
-            ->getResult();
+            ->getResult()
+        ;
     }
 
     /**
@@ -43,16 +65,21 @@ class TournamentRepository extends ServiceEntityRepository
      *
      * @return Tournament[]
      */
-    public function findPastTournaments(): array
+    public function findPastTournaments(User $user, bool $mine = false): array
     {
         $currentDate = new \DateTime();
 
-        return $this->createQueryBuilder('t')
+        $qb = $this->createQueryBuilder('t')
             ->where('t.endDate < :currentDate')
-            ->setParameter('currentDate', $currentDate->setTime(0, 0, 0)) // Set the time to 00:00:00
+            ->setParameter('currentDate', $currentDate->setTime(0, 0, 0));
+
+        $qb = $this->getMine($qb, $user, $mine);
+
+        return $qb
             ->orderBy('t.endDate', 'DESC')
             ->getQuery()
-            ->getResult();
+            ->getResult()
+        ;
     }
 
     /**
@@ -60,17 +87,22 @@ class TournamentRepository extends ServiceEntityRepository
      *
      * @return Tournament[]
      */
-    public function findInProgressTournaments(): array
+    public function findInProgressTournaments(User $user, bool $mine = false): array
     {
         $currentDate = new \DateTime();
 
-        return $this->createQueryBuilder('t')
+        $qb = $this->createQueryBuilder('t')
             ->where('t.beginDate <= :beginDate')
             ->setParameter('beginDate', $currentDate->setTime(0, 0, 0))
             ->andWhere('t.endDate >= :endDate')
-            ->setParameter('endDate', $currentDate->setTime(23, 59, 59))
+            ->setParameter('endDate', $currentDate->setTime(23, 59, 59));
+
+        $qb = $this->getMine($qb, $user, $mine);
+
+        return $qb
             ->orderBy('t.endDate', 'DESC')
             ->getQuery()
-            ->getResult();
+            ->getResult()
+        ;
     }
 }
