@@ -16,6 +16,7 @@ class TournamentProvider implements ProviderInterface
     {
         return [
             'upcoming' => $this->repository->findUpcomingTournaments(),
+            'inprogress' => $this->repository->findInProgressTournaments(),
             'past' => $this->repository->findPastTournaments(),
         ];
     }

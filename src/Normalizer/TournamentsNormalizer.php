@@ -30,6 +30,7 @@ class TournamentsNormalizer implements NormalizerInterface
             '@context' => '/api/contexts/Tournament',
             '@id' => '/api/tournaments/',
             '@type' => 'hydra:Collection',
+            'inprogress' => $this->normalizeOperations($object['inprogress'], $context),
             'upcoming' => $this->normalizeOperations($object['upcoming'], $context),
             'past' => $this->normalizeOperations($object['past'], $context)
         ];
@@ -37,7 +38,7 @@ class TournamentsNormalizer implements NormalizerInterface
 
     public function supportsNormalization(mixed $data, string $format = null)
     {
-        return is_array($data) && array_key_exists('upcoming', $data) && array_key_exists('past', $data);
+        return is_array($data) && array_key_exists('upcoming', $data) && array_key_exists('past', $data) && array_key_exists('inprogress', $data);
     }
 
     public function __call(string $name, array $arguments)

@@ -54,4 +54,23 @@ class TournamentRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+
+    /**
+     * Récupère les tournois en cours.
+     *
+     * @return Tournament[]
+     */
+    public function findInProgressTournaments(): array
+    {
+        $currentDate = new \DateTime();
+
+        return $this->createQueryBuilder('t')
+            ->where('t.beginDate <= :beginDate')
+            ->setParameter('beginDate', $currentDate->setTime(0, 0, 0))
+            ->andWhere('t.endDate >= :endDate')
+            ->setParameter('endDate', $currentDate->setTime(23, 59, 59))
+            ->orderBy('t.endDate', 'DESC')
+            ->getQuery()
+            ->getResult();
+    }
 }
