@@ -3,15 +3,13 @@
 namespace App\Service;
 
 use App\Entity\User;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 class UserService
 {
-    public function __construct(private readonly EntityManagerInterface $entityManager,
-                                private readonly FileService $fileService,
+    public function __construct(private readonly FileService $fileService,
                                 private readonly ParameterBagInterface $parameterBag)
     {}
 
