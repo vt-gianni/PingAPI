@@ -5,6 +5,8 @@ namespace App\Entity;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Post;
+use App\Controller\RegisterUserToSeries;
 use App\Repository\TournamentRepository;
 use App\State\TournamentProvider;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -25,6 +27,13 @@ use Symfony\Component\Serializer\Annotation\Groups;
             uriTemplate: '/',
             security: 'is_granted("ROLE_USER") === true',
             provider: TournamentProvider::class
+        ),
+        new Post(
+            uriTemplate: '/{id}/register',
+            requirements: ['id' => '\d+'],
+            controller: RegisterUserToSeries::class,
+            security: 'is_granted("ROLE_USER") === true',
+            read: false
         )
     ],
     routePrefix: '/tournaments',

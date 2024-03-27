@@ -5,7 +5,7 @@ namespace App\Entity;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Get;
-use App\Controller\RegisterUserToSerie;
+use App\Controller\RegisterUserToSeries;
 use App\Repository\SerieRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -19,12 +19,6 @@ use Symfony\Component\Serializer\Annotation\Groups;
         new Get(
             uriTemplate: '/{id}',
             requirements: ['id' => '\d+'],
-            security: 'is_granted("ROLE_USER") === true'
-        ),
-        new Post(
-            uriTemplate: '/{id}/register',
-            requirements: ['id' => '\d+'],
-            controller: RegisterUserToSerie::class,
             security: 'is_granted("ROLE_USER") === true'
         )
     ],
