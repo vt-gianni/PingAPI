@@ -110,7 +110,7 @@ class TournamentRepository extends ServiceEntityRepository
             ->where('t.beginDate <= :beginDate')
             ->setParameter('beginDate', $currentDate->setTime(0, 0, 0))
             ->andWhere('t.endDate >= :endDate')
-            ->setParameter('endDate', $currentDate->setTime(23, 59, 59));
+            ->setParameter('endDate', $currentDate->setTime(0, 0, 0));
 
         $qb = $this->getMine($qb, $user, $mine);
         $qb = $this->search($qb, $search);
