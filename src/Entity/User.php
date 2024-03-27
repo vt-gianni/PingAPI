@@ -66,7 +66,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Assert\Email(
         message: "L'adresse email '{{ value }}' n'est pas valide."
     )]
-    #[Groups(["users_read", "users_write", "users_put"])]
+    #[Groups(["users_read", "users_write", "users_put", "series_read"])]
     private ?string $email = null;
 
     #[ORM\Column]
@@ -93,7 +93,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         maxMessage: "Le prénom ne doit pas comporter plus de 50 caractères."
     )]
     #[Assert\Regex("/^[A-Za-zÀ-úœ'\-\s]+$/", message: "Le champ 'lastName' contient des caractères invalides.")]
-    #[Groups(["users_read", "users_write", "users_put"])]
+    #[Groups(["users_read", "users_write", "users_put", "series_read"])]
     private ?string $firstName = null;
 
     #[ORM\Column(length: 255, nullable: true)]
@@ -104,24 +104,24 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         maxMessage: "Le nom ne doit pas comporter plus de 50 caractères."
     )]
     #[Assert\Regex("/^[A-Za-zÀ-úœ'\-\s]+$/", message: "Le champ 'lastName' contient des caractères invalides.")]
-    #[Groups(["users_read", "users_write", "users_put"])]
+    #[Groups(["users_read", "users_write", "users_put", "series_read"])]
     private ?string $lastName = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(["users_read", "users_write", "users_put"])]
+    #[Groups(["users_read", "users_write", "users_put", "series_read"])]
     private ?string $avatar = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(["users_read", "users_write", "users_put"])]
+    #[Groups(["users_read", "users_write", "users_put", "series_read"])]
     private ?string $licenceNumber = null;
 
     #[ORM\Column(nullable: true)]
     #[Assert\GreaterThanOrEqual(500)]
-    #[Groups(["users_read", "users_write", "users_put"])]
+    #[Groups(["users_read", "users_write", "users_put", "series_read"])]
     private ?int $officialPoints = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
-    #[Groups(["users_read", "users_write", "users_put"])]
+    #[Groups(["users_read", "users_write", "users_put", "series_read"])]
     private ?\DateTimeInterface $birthdate = null;
 
     #[ORM\ManyToOne(cascade: ['persist'], inversedBy: 'users')]
@@ -129,7 +129,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?Club $club = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(["users_read", "users_write", "users_put"])]
+    #[Groups(["users_read", "users_write", "users_put", "series_read"])]
     #[ValidateSexe]
     private ?string $sexe = null;
 

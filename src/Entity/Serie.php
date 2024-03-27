@@ -93,7 +93,7 @@ class Serie
     private ?int $price = null;
 
     #[ORM\ManyToMany(targetEntity: User::class, inversedBy: 'series')]
-    #[Groups(["series_read", "tournaments_read"])]
+    #[Groups(["series_read", "tournaments_read", "series_read"])]
     private Collection $usersRegistered;
 
     #[ORM\Column]
