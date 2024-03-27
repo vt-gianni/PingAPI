@@ -13,8 +13,8 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 class TournamentService
 {
     public function __construct(private readonly EntityManagerInterface $entityManager,
-                                private readonly Security $security,
-                                private SerieRepository $serieRepository)
+                                private readonly Security               $security,
+                                private readonly SerieRepository        $serieRepository)
     {}
 
     /**
