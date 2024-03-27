@@ -107,7 +107,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Groups(["users_read", "users_write", "users_put", "series_read"])]
     private ?string $lastName = null;
 
-    #[ORM\Column(length: 255, nullable: true)]
+    #[ORM\Column(type: "text", nullable: true)]
     #[Groups(["users_read", "users_write", "users_put", "series_read"])]
     private ?string $avatar = null;
 
