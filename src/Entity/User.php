@@ -137,6 +137,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Groups(["users_read", "users_write", "users_put"])]
     private Collection $serieUsers;
 
+    #[ORM\Column]
+    #[Groups(["users_read", "users_put"])]
+    private ?bool $registrationNotification = null;
+
+    #[ORM\Column]
+    #[Groups(["users_read", "users_put"])]
+    private ?bool $contestBeginNotification = null;
+
+    #[ORM\Column]
+    #[Groups(["users_read", "users_put"])]
+    private ?bool $serieBeginNotification = null;
+
     public function __construct()
     {
         $this->serieUsers = new ArrayCollection();
@@ -334,6 +346,42 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
                 $serieUser->setUser(null);
             }
         }
+
+        return $this;
+    }
+
+    public function isRegistrationNotification(): ?bool
+    {
+        return $this->registrationNotification;
+    }
+
+    public function setRegistrationNotification(bool $registrationNotification): static
+    {
+        $this->registrationNotification = $registrationNotification;
+
+        return $this;
+    }
+
+    public function isContestBeginNotification(): ?bool
+    {
+        return $this->contestBeginNotification;
+    }
+
+    public function setContestBeginNotification(bool $contestBeginNotification): static
+    {
+        $this->contestBeginNotification = $contestBeginNotification;
+
+        return $this;
+    }
+
+    public function isSerieBeginNotification(): ?bool
+    {
+        return $this->serieBeginNotification;
+    }
+
+    public function setSerieBeginNotification(bool $serieBeginNotification): static
+    {
+        $this->serieBeginNotification = $serieBeginNotification;
 
         return $this;
     }
