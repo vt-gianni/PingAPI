@@ -133,13 +133,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ValidateSexe]
     private ?string $sexe = null;
 
-    #[ORM\ManyToMany(targetEntity: Serie::class, mappedBy: 'usersRegistered')]
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: SerieUser::class, orphanRemoval: true)]
     #[Groups(["users_read", "users_write", "users_put"])]
-    private Collection $series;
+    private Collection $serieUsers;
 
     public function __construct()
     {
-        $this->series = new ArrayCollection();
+        $this->serieUsers = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -309,27 +309,30 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
     /**
-     * @return Collection<int, Serie>
+     * @return Collection<int, SerieUser>
      */
-    public function getSeries(): Collection
+    public function getSerieUsers(): Collection
     {
-        return $this->series;
+        return $this->serieUsers;
     }
 
-    public function addSeries(Serie $series): static
+    public function addSerieUser(SerieUser $serieUser): static
     {
-        if (!$this->series->contains($series)) {
-            $this->series->add($series);
-            $series->addUsersRegistered($this);
+        if (!$this->serieUsers->contains($serieUser)) {
+            $this->serieUsers->add($serieUser);
+            $serieUser->setUser($this);
         }
 
         return $this;
     }
 
-    public function removeSeries(Serie $series): static
+    public function removeSerieUser(SerieUser $serieUser): static
     {
-        if ($this->series->removeElement($series)) {
-            $series->removeUsersRegistered($this);
+        if ($this->serieUsers->removeElement($serieUser)) {
+            // set the owning side to null (unless already changed)
+            if ($serieUser->getUser() === $this) {
+                $serieUser->setUser(null);
+            }
         }
 
         return $this;

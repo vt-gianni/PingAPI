@@ -3,6 +3,7 @@
 namespace App\Service;
 
 use App\Entity\Serie;
+use App\Entity\SerieUser;
 use App\Entity\Tournament;
 use App\Entity\User;
 use App\Repository\SerieRepository;
@@ -27,12 +28,21 @@ class TournamentService
         /** @var User $currentUser */
         $currentUser = $this->security->getUser();
 
-        foreach ($series as $serieId) {
-            if (!($serie = $this->serieRepository->find($serieId))) {
+        foreach ($series as $serieElement) {
+            if (!array_key_exists('id', $serieElement) || !array_key_exists('hasPaid', $serieElement)) {
+                throw new BadRequestHttpException('Les champs id et hasPaid sont obligatoires dans chaque série renseignée.');
+            }
+            if (!($serie = $this->serieRepository->find($serieElement['id']))) {
                 throw new BadRequestHttpException('Cette série n\'existe pas.');
             }
             $this->checkRegistrationConditions($tournament, $serie, $currentUser);
-            $serie->addUsersRegistered($currentUser);
+            $serieUser = new SerieUser();
+            $serieUser->setSerie($serie);
+            $serieUser->setUser($currentUser);
+            $serieUser->setHasPaid(boolval($serieElement['hasPaid']));
+            $this->entityManager->persist($serieUser);
+
+            $serie->addSerieUser($serieUser);
         }
 
         $this->entityManager->flush();
@@ -49,13 +59,15 @@ class TournamentService
         if ($serie->getTournament() !== $tournament) {
             throw new BadRequestHttpException('Cette série ne correspond pas au tournoi sélectionné.');
         }
-        if ($serie->getUsersRegistered()->contains($user)) {
-            throw new BadRequestHttpException('Vous êtes déjà inscrit à cette série.');
+        foreach ($serie->getSerieUsers() as $serieUser) {
+            if ($serieUser->getUser() === $user) {
+                throw new BadRequestHttpException('Vous êtes déjà inscrit à cette série.');
+            }
         }
         if (!$serie->isCanRegister()) {
             throw new BadRequestHttpException('Cette série n\'accepte plus les inscriptions.');
         }
-        if ($serie->getUsersRegistered()->count() >= $serie->getMaxPlaces()) {
+        if ($serie->getSerieUsers()->count() >= $serie->getMaxPlaces()) {
             throw new BadRequestHttpException('Cette série est complète.');
         }
     }

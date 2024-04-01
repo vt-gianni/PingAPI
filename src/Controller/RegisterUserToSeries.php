@@ -19,11 +19,11 @@ class RegisterUserToSeries extends AbstractController
     {
         $data = json_decode($this->requestStack->getCurrentRequest()->getContent(), true);
 
-        if (!array_key_exists('ids', $data) || !is_array($data['ids'])) {
-            throw new BadRequestHttpException('Le champ "series" manque.');
+        if (!array_key_exists('userSeries', $data) || !is_array($data['userSeries'])) {
+            throw new BadRequestHttpException('Le champ "userSeries" manque.');
         }
 
-        $this->tournamentService->register($tournament, $data['ids']);
+        $this->tournamentService->register($tournament, $data['userSeries']);
 
         return $this->json($tournament, 201);
     }

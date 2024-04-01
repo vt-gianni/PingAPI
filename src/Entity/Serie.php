@@ -86,17 +86,17 @@ class Serie
     #[Groups(["tournaments_read", "users_read", "series_read"])]
     private ?int $price = null;
 
-    #[ORM\ManyToMany(targetEntity: User::class, inversedBy: 'series')]
-    #[Groups(["series_read", "tournaments_read", "series_read"])]
-    private Collection $usersRegistered;
-
     #[ORM\Column]
     #[Groups(["tournaments_read", "users_read", "series_read"])]
     private ?bool $canRegister = null;
 
+    #[ORM\OneToMany(mappedBy: 'serie', targetEntity: SerieUser::class, orphanRemoval: true)]
+    #[Groups(["series_read", "tournaments_read", "series_read"])]
+    private Collection $serieUsers;
+
     public function __construct()
     {
-        $this->usersRegistered = new ArrayCollection();
+        $this->serieUsers = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -268,22 +268,6 @@ class Serie
         return $this->usersRegistered;
     }
 
-    public function addUsersRegistered(User $usersRegistered): static
-    {
-        if (!$this->usersRegistered->contains($usersRegistered)) {
-            $this->usersRegistered->add($usersRegistered);
-        }
-
-        return $this;
-    }
-
-    public function removeUsersRegistered(User $usersRegistered): static
-    {
-        $this->usersRegistered->removeElement($usersRegistered);
-
-        return $this;
-    }
-
     public function isCanRegister(): ?bool
     {
         return $this->canRegister;
@@ -292,6 +276,36 @@ class Serie
     public function setCanRegister(bool $canRegister): static
     {
         $this->canRegister = $canRegister;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, SerieUser>
+     */
+    public function getSerieUsers(): Collection
+    {
+        return $this->serieUsers;
+    }
+
+    public function addSerieUser(SerieUser $serieUser): static
+    {
+        if (!$this->serieUsers->contains($serieUser)) {
+            $this->serieUsers->add($serieUser);
+            $serieUser->setSerie($this);
+        }
+
+        return $this;
+    }
+
+    public function removeSerieUser(SerieUser $serieUser): static
+    {
+        if ($this->serieUsers->removeElement($serieUser)) {
+            // set the owning side to null (unless already changed)
+            if ($serieUser->getSerie() === $this) {
+                $serieUser->setSerie(null);
+            }
+        }
 
         return $this;
     }
