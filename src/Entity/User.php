@@ -93,7 +93,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         maxMessage: "Le prénom ne doit pas comporter plus de 50 caractères."
     )]
     #[Assert\Regex("/^[A-Za-zÀ-úœ'\-\s]+$/", message: "Le champ 'lastName' contient des caractères invalides.")]
-    #[Groups(["users_read", "users_write", "users_put", "series_read"])]
+    #[Groups(["users_read", "users_write", "users_put", "series_read", "tournaments_read"])]
     private ?string $firstName = null;
 
     #[ORM\Column(length: 255, nullable: true)]
@@ -104,7 +104,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         maxMessage: "Le nom ne doit pas comporter plus de 50 caractères."
     )]
     #[Assert\Regex("/^[A-Za-zÀ-úœ'\-\s]+$/", message: "Le champ 'lastName' contient des caractères invalides.")]
-    #[Groups(["users_read", "users_write", "users_put", "series_read"])]
+    #[Groups(["users_read", "users_write", "users_put", "series_read", "tournaments_read"])]
     private ?string $lastName = null;
 
     #[ORM\Column(type: "text", nullable: true)]
@@ -117,7 +117,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(nullable: true)]
     #[Assert\GreaterThanOrEqual(500)]
-    #[Groups(["users_read", "users_write", "users_put", "series_read"])]
+    #[Groups(["users_read", "users_write", "users_put", "series_read", "tournaments_read"])]
     private ?int $officialPoints = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]

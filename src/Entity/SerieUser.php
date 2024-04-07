@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Repository\SerieUserRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: SerieUserRepository::class)]
 class SerieUser
@@ -19,9 +20,11 @@ class SerieUser
 
     #[ORM\ManyToOne(inversedBy: 'serieUsers')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(["tournaments_read", "series_read"])]
     private ?User $user = null;
 
     #[ORM\Column]
+    #[Groups(["tournaments_read", "series_read"])]
     private ?bool $hasPaid = null;
 
     public function getId(): ?int
